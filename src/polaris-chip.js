@@ -48,6 +48,20 @@ export class PolarisChip extends LitElement {
         /* Always make sure that your element has a default way of being displayed */
         display: block;
       }
+      span {
+        background-color: orange;
+        color: black;
+        font-size: 24px;
+        padding: 16px;
+        margin 8px;
+
+      }
+
+      span:hover {
+        background-color: grey;
+        border: 1px solid black;
+        
+      }  
     `;
   }
 
