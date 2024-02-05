@@ -14,6 +14,7 @@ export class MyCard extends LitElement {
   constructor() {
     super();
     this.title = "My card";
+    this.buttontitle = "Second card";
   }
 
   static get styles() {
@@ -21,7 +22,7 @@ export class MyCard extends LitElement {
       :host { 
 span {
   font-size: 16px; 
-
+}
 h1 {
   font-size: 2em;
   margin: 0;
@@ -125,12 +126,38 @@ ul li:nth-child(even) {
   }
 
   render() {
-    return html`<span>${this.title}</span>`;
+    return html`<div class="control-wrapper">
+    <a href="https://hax.psu.edu">
+      <button class="btn">${this.buttontitle}</button>
+    </a>
+  </div>
+  <div id="cardlist">
+    <div class="card">
+      <img class="card-image" alt="Github profile photo of the prof" src="https://cdn.britannica.com/77/170477-050-1C747EE3/Laptop-computer.jpg" />
+      <div class="card-text">
+        <h3 class="card-title">Cassius French</h3>
+        <div class="card-details">
+          <p>
+          Hello my name is Cassius French. This card was created for my IST 256 class. This card is heavily inspiried by what the professor created on Youtube. This is late because I wasn't in the country for the past week and I didn't have access to internet for some time until now.
+          <h4>Main Link</h4>
+          <ul class="links">
+           <li>
+              <a href="https://hax.psu.edu">
+              HAX [dot] PSU</a>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>`;
   }
 
   static get properties() {
     return {
       title: { type: String },
+      buttontitle: { type: String },
+      link: { type: String },
     };
   }
 }
