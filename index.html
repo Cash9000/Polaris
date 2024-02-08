@@ -1,6 +1,11 @@
 <!doctype html>
 <html lang="en">
-
+  <details ?open="${this.fancy}">
+    <summary>Description</summary>
+    <div>
+      <slot>${this.description}</slot>
+    </div>
+  </details>
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
@@ -32,11 +37,13 @@
   <polaris-chip title="Cool stuff"></polaris-chip>
 
   <h1>my-card</h1>
+  <my-card title="Fresh Prince" fancy img="https://i.ibb.co/ZWY5PBQ/images.jpg"></my-card>
   <my-card title="First" buttontitle="FirstButton"  img="https://m.media-amazon.com/images/I/51eQrKrB1jL.jpg"></my-card>
   <my-card title="Second" buttontitle="SecondButton" img="https://i.pcmag.com/imagery/reviews/05jhTX87Wr4f5FVH5XSos96-1.fit_lim.size_840x473.v1646670731.jpg"></my-card>
   <my-card title="Third" buttontitle="ThirdButton" ></my-card>
   <my-card title="Fourth" buttontitle="FourthButton"></my-card>
   <my-card title="Fifth" buttontitle="FifthButton"></my-card>
+  
 
   <!-- this is what is bringing in the definition for this tag -->
   <script type="module" src="./src/polaris-chip.js"></script>

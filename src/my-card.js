@@ -16,10 +16,17 @@ export class MyCard extends LitElement {
     this.title = "My card";
     this.buttontitle = "Second card";
     this.img = "https://cdn.britannica.com/77/170477-050-1C747EE3/Laptop-computer.jpg"
+    this.fancy = false;
   }
 
   static get styles() {
     return css`
+    :host([fancy]) {
+display: block;
+  background-color: pink;
+  border: 2px solid fuchsia;
+  box-shadow: 10px 5px 5px red;
+}
       :host { 
 span {
   font-size: 16px; 
@@ -159,6 +166,7 @@ ul li:nth-child(even) {
       title: { type: String },
       buttontitle: { type: String },
       img: { type: String },
+      fancy: { type: Boolean, reflect: true }
     };
   }
 }
