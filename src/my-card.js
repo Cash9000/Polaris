@@ -17,6 +17,7 @@ export class MyCard extends LitElement {
     this.buttontitle = "Second card";
     this.img = "https://cdn.britannica.com/77/170477-050-1C747EE3/Laptop-computer.jpg"
     this.fancy = false;
+    this.describer = "Information";
   }
 
   static get styles() {
@@ -163,10 +164,15 @@ ul li:nth-child(even) {
       <button class="btn">${this.buttontitle}</button>
     </a>
   </div>
-  <details ?open="${this.fancy}" @toggle="${this.openChanged}"></details>
+  <details ?open="${this.fancy}" @toggle="${this.openChanged}"> 
+    <summary>details</summary>
+      <div>
+        <h3>Title: ${this.title}</h3>
+        <p>${this.describer}</p>
+      </div></details>
   <div id="cardlist">
     <div class="card">
-      <img class="card-image" alt="Github profile photo of the prof" src="${this.img}" />
+      <img class="card-image" alt="Github profile photo of the prof" src="${this.img}" style="width: 300px; height: auto;"/>
       <div class="card-text">
         <h3 class="card-title">Cassius French</h3>
         <div class="card-details">
@@ -191,7 +197,8 @@ ul li:nth-child(even) {
       title: { type: String },
       buttontitle: { type: String },
       img: { type: String },
-      fancy: { type: Boolean, reflect: true }
+      fancy: { type: Boolean, reflect: true },
+      describer: {type: String},
     };
   }
 }
