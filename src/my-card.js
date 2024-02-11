@@ -79,7 +79,23 @@ h3,h4,h5,h6 {
   padding: 8px 8px 16px;
   margin: 0 -8px;
 }
+details summary {
+    text-align: left;
+    font-size: 20px;
+    padding: 8px 0;
+  }
 
+  details[open] summary {
+    font-weight: bold;
+  }
+  
+  details div {
+    border: 2px solid black;
+    text-align: left;
+    padding: 8px;
+    height: 70px;
+    overflow: auto;
+  }
 ul {
   margin: 0;
   padding: 0 32px;
