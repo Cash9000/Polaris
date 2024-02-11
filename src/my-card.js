@@ -132,13 +132,22 @@ ul li:nth-child(even) {
         }
     `;
   }
-
+  openChanged(e) {
+    console.log(e.newState);
+    if (e.newState === "open") {
+      this.fancy = true;
+    }
+    else {
+      this.fancy = false;
+    }
+  }
   render() {
     return html`<div class="control-wrapper">
     <a href="https://hax.psu.edu">
       <button class="btn">${this.buttontitle}</button>
     </a>
   </div>
+  <details ?open="${this.fancy}" @toggle="${this.openChanged}"></details>
   <div id="cardlist">
     <div class="card">
       <img class="card-image" alt="Github profile photo of the prof" src="${this.img}" />
