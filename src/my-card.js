@@ -178,6 +178,7 @@ ul li:nth-child(even) {
         <div class="card-details">
           <p>
           Hello my name is Cassius French. This card was created for my IST 256 class. This card is heavily inspiried by what the professor created on Youtube. This is late because I wasn't in the country for the past week and I didn't have access to internet for some time until now.
+          </p>
           <h4>Main Link</h4>
           <ul class="links">
            <li>
