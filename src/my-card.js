@@ -1,5 +1,5 @@
 import { LitElement, html, css } from 'lit';
-
+import "@lrnwebcomponents/meme-maker/meme-maker.js";
 /**
  * Now it's your turn. Here's what we need to try and do
  * 1. 
