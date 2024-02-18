@@ -2,7 +2,7 @@
 // more modern (relatively speaking) and allows the web to feel like
 // a full blown development environment
 import { LitElement, html, css } from 'lit';
-
+import "@lrnwebcomponents/multiple-choice/lib/confetti-container.js";
 // export means that other JS files can reference this JS file and
 // pull in this class
 
@@ -69,6 +69,7 @@ export class CounterApp extends LitElement {
 
   render() {
     return html`
+    <confetti-container id="confetti"></confetti-container>
       <div class="counter">${this.counter}</div>
       <div class="buttons">
         <button @click=${this.increment} ?disabled="${this.counter >= this.max}">+</button>
@@ -76,7 +77,31 @@ export class CounterApp extends LitElement {
       </div>
     `;
   }
-
+  updated(changedProperties) {
+    super.updated(changedProperties);
+    if (changedProperties.has('counter')) {
+      this.style.setProperty('--counter-color', this.getCounterColor());
+      if (this.counter === 21) {
+        this.makeItRain();
+      }
+    }
+  }
+  makeItRain() {
+    import("@lrnwebcomponents/multiple-choice/lib/confetti-container.js").then(
+      (module) => {
+        // This is a minor timing 'hack'. We know the code library above will import prior to this running
+        // The "set timeout 0" means "wait 1 microtask and run it on the next cycle.
+        // this "hack" ensures the element has had time to process in the DOM so that when we set popped
+        // it's listening for changes so it can react
+        setTimeout(() => {
+          // forcibly set the poppped attribute on something with id confetti
+          // while I've said in general NOT to do this, the confetti container element will reset this
+          // after the animation runs so it's a simple way to generate the effect over and over again
+          this.shadowRoot.querySelector("#confetti").setAttribute("popped", "");
+        }, 0);
+      }
+    );
+  }
   static get properties() {
     return {
       counter: { type: Number },
