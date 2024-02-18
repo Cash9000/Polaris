@@ -1,7 +1,5 @@
 <!doctype html>
 <html lang="en">
-  <meme-maker alt="Cat stalking a small toy" image-url="https://cdn2.thecatapi.com/images/9j5.jpg" top-text="I bring you" bottom-text="the death">
-  </meme-maker>
   <details ?open="${this.fancy}">
     <summary>Description</summary>
     <div>
@@ -29,7 +27,9 @@
   </style>
   <title>polaris-chip / my-card</title>
 </head>
-
+<h1>counter-app</h1>
+  <counter-app></counter-app>
+  <counter-app counter="16" min="10" max="25"></counter-app>
 <body>
   <h1>polaris-chip</h1>
   <!-- this is going to do whatever the tag's defaults are -->
@@ -50,6 +50,7 @@
   <!-- this is what is bringing in the definition for this tag -->
   <script type="module" src="./src/polaris-chip.js"></script>
   <script type="module" src="./src/my-card.js"></script>
+  <script type="module" src="./src/counter-app.js"></script>
 </body>
 
 </html>
