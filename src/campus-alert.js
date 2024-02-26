@@ -28,7 +28,7 @@ export class CampusAlert extends LitElement {
   constructor() {
     super();
     // a variable on this object called title
-    this.title = 'My boilerplate';
+    this.open = true;
   }
 
   // CSS styles are scoped JUST to this element. This uses a technology called
@@ -39,29 +39,49 @@ export class CampusAlert extends LitElement {
     // "css" called here is actually a function exported from Lit at the top
     // so that it scopes the CSS nicely and also applies sanitization
     return css`
-    /*
-      :host is a special selector meaning "the tag itself"
-      Think of if we were looking at how a <strong> tag is made. It would have
-      :host { font-weight: bold; display: inline; }
-    */
-      :host {
-        /* Always make sure that your element has a default way of being displayed */
+    :host([status="notice"]) {
+      --alert-color: #007bff; /* Blue for notice */
+    }
+    :host([status="warning"]) {
+      --alert-color: #ffc107; /* Yellow for warning */
+    }
+    :host([status="alert"]) {
+      --alert-color: #dc3545; /* Red for alert */
+    }
+    :host {
+        --alert-color: #ffc107; /* Default alert color */
+        --alert-text-color: #000; /* Default text color */
+        --alert-close-color: #000; /* Default close button color */
         display: block;
+        position: sticky;
+        top: 0;
+        background: var(--alert-color);
+        padding: 10px;
+        color: var(--alert-text-color);
+        font-family: sans-serif;
       }
-      span {
-        background-color: orange;
-        color: black;
-        font-size: 24px;
-        padding: 16px;
-        margin: 8px;
-
+      .alert-icon {
+        color: var(--alert-close-color);
+        margin-right: 10px;
       }
-
-      span:hover {
-        background-color: grey;
-        border: 1px solid black;
-        
-      }  
+      .close-btn {
+        float: right;
+        border: none;
+        background: none;
+        color: var(--alert-close-color);
+        cursor: pointer;
+      }
+      .alert-content {
+        display: flex;
+        align-items: center;
+      }
+      .alert-text {
+        flex-grow: 1;
+      }
+      .alert-date {
+        margin-right: 20px;
+        font-weight: bold;
+      }
     `;
   }
 
@@ -73,29 +93,42 @@ export class CampusAlert extends LitElement {
    * @returns an HTML template which gets sanitized and rendered
    */
   render() {
-    // html much like css above applies sanitization / security and ensures
-    // there is a valid HTML template that is displayed on screen. It's important
-    // to keep in mind that any broken HTML tags or JS variables here can cause
-    // your element to not render so color coding and syntax checking with console
-    // open in your browser is critical!
-
-    // ` is a special character that allows JS to print variables in it using
-    // the ${} syntax, any variable can happen between those tags. Shown below
-    // it is going to print the title of the element. The magic of Lit is that
-    // when title is changed (even by inspecting the document and hacking the value)
-    // it will automatically update what is displayed and do so incredibly quickly
-    return html`<span>${this.title}</span>`;
+    return this.open
+    ? html`
+        <div class="alert-content">
+          <span class="alert-icon">⚠️</span>
+          <div class="alert-text">
+            <slot></slot> <!-- User provided content will be projected here -->
+          </div>
+          <div class="alert-date">${this.date}</div>
+          <button class="close-btn" @click=${this.toggle}>CLOSE</button>
+        </div>
+      `
+    : html`
+    <button @click="${this.toggle}">REOPEN ALERT</button>
+    `;
   }
-
-  // LitElement uses the properties call to do the following:
-  // - When a value changes it reacts to the change
-  // - When it reacts to the change and it's listed in the render() method, it rerenders
-  // - this is what users would expect, but is not the way the web usually works
-  // - Lit + Web component spec + properties == HTML with data variables
+  toggle() {
+    this.open = !this.open;
+    // Save state to localStorage
+    if (this.open) {
+      localStorage.removeItem('campusAlertClosed');
+    } else {
+      localStorage.setItem('campusAlertClosed', 'true');
+    }
+  }
+  connectedCallback() {
+    super.connectedCallback();
+    if (localStorage.getItem('campusAlertClosed')) {
+      this.open = false;
+    }
+  }
   static get properties() {
     return {
       // this is a String. Array, Object, Number, Boolean are other valid values here
-      title: { type: String },
+      open: { type: Boolean, reflect: true },
+      status: { type: String, reflect: true },
+      date: { type: String }
     };
   }
 }
