@@ -53,7 +53,7 @@ export class PolarisChip extends LitElement {
         color: black;
         font-size: 24px;
         padding: 16px;
-        margin 8px;
+        margin: 8px;
 
       }
 

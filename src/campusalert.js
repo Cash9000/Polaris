@@ -2,7 +2,7 @@
 // more modern (relatively speaking) and allows the web to feel like
 // a full blown development environment
 import { LitElement, html, css } from 'lit';
-import "@lrnwebcomponents/multiple-choice/lib/confetti-container.js";
+
 // export means that other JS files can reference this JS file and
 // pull in this class
 
@@ -16,113 +16,87 @@ import "@lrnwebcomponents/multiple-choice/lib/confetti-container.js";
 // We will only stick with Lit for this class and look at Vanilla examples
 // but compatibility across sites / libraries is unique to web components
 // and not a thing in React, Vue, Angular, etc
-export class CounterApp extends LitElement {
+export class CampusAlert extends LitElement {
   // this is not a requirement, but it's a convention I personally enjoy
   // because it helps when looking at multiple elements. I open this file
   // I glance and go "oh the HTML tag for this code is called polaris-chip"
   // see the very bottom of the file for where this is actually implemented
   static get tag() {
-    return 'counter-app';
+    return 'polaris-chip';
   }
-
+  // constructor establishes defaults for the class
   constructor() {
     super();
-    this.counter = 0;
-    this.min = 0;
-    this.max = 100;
+    // a variable on this object called title
+    this.title = 'My boilerplate';
   }
 
+  // CSS styles are scoped JUST to this element. This uses a technology called
+  // "Shadow DOM" which is ver controversial to some, but to new people and new
+  // things, it's incredible. It automatically ensures that the things in your render()
+  // method below it look exactly the same always no matter where they are loaded!
   static get styles() {
+    // "css" called here is actually a function exported from Lit at the top
+    // so that it scopes the CSS nicely and also applies sanitization
     return css`
+    /*
+      :host is a special selector meaning "the tag itself"
+      Think of if we were looking at how a <strong> tag is made. It would have
+      :host { font-weight: bold; display: inline; }
+    */
       :host {
+        /* Always make sure that your element has a default way of being displayed */
         display: block;
-        text-align: center;
       }
-      .counter {
-        font-size: 96px;
-        color: var(--counter-color, black); /* default to black */
+      span {
+        background-color: orange;
+        color: black;
+        font-size: 24px;
+        padding: 16px;
+        margin: 8px;
+
       }
-      .buttons {
-        margin-top: 16px;
-      }
-      button {
-      font-size: 24px;
-      padding: 8px 16px;
-      margin: 0 8px;
-      cursor: pointer;
-      border: none;
-      background-color: orange; /* updated to orange */
-      color: black;
-      border-radius: 4px;
-    }
-    button:disabled {
-      background-color: #ccc;
-      cursor: not-allowed;
-    }
+
+      span:hover {
+        background-color: grey;
+        border: 1px solid black;
+        
+      }  
     `;
-  }
-  
-  updated() {
-    super.updated();
-    this.style.setProperty('--counter-color', this.getCounterColor());
   }
 
+  /**
+   * render method is specific to LitElement based code. Anything you write here
+   * you can think of as what gets printed to the screen when the tag is used.
+   * In this example, <polaris-chip></polaris-chip> will actually display what you
+   * see below in the render method.
+   * @returns an HTML template which gets sanitized and rendered
+   */
   render() {
-    return html`
-    <confetti-container id="confetti">
-      <div class="counter">${this.counter}</div>
-      <div class="buttons">
-        <button @click=${this.increment} ?disabled="${this.counter >= this.max}">+</button>
-        <button @click=${this.decrement} ?disabled="${this.counter <= this.min}">-</button>
-      </div>
-      </confetti-container>
-    `;
+    // html much like css above applies sanitization / security and ensures
+    // there is a valid HTML template that is displayed on screen. It's important
+    // to keep in mind that any broken HTML tags or JS variables here can cause
+    // your element to not render so color coding and syntax checking with console
+    // open in your browser is critical!
+
+    // ` is a special character that allows JS to print variables in it using
+    // the ${} syntax, any variable can happen between those tags. Shown below
+    // it is going to print the title of the element. The magic of Lit is that
+    // when title is changed (even by inspecting the document and hacking the value)
+    // it will automatically update what is displayed and do so incredibly quickly
+    return html`<span>${this.title}</span>`;
   }
-  updated(changedProperties) {
-    super.updated(changedProperties);
-    if (changedProperties.has('counter')) {
-      this.style.setProperty('--counter-color', this.getCounterColor());
-      if (this.counter === 21) {
-        this.makeItRain();
-      }
-    }
-  }
-  makeItRain() {
-    import("@lrnwebcomponents/multiple-choice/lib/confetti-container.js").then(
-      (module) => {
-        // This is a minor timing 'hack'. We know the code library above will import prior to this running
-        // The "set timeout 0" means "wait 1 microtask and run it on the next cycle.
-        // this "hack" ensures the element has had time to process in the DOM so that when we set popped
-        // it's listening for changes so it can react
-        setTimeout(() => {
-          // forcibly set the poppped attribute on something with id confetti
-          // while I've said in general NOT to do this, the confetti container element will reset this
-          // after the animation runs so it's a simple way to generate the effect over and over again
-          this.shadowRoot.querySelector("#confetti").setAttribute("popped", "");
-        }, 0);
-      }
-    );
-  }
+
+  // LitElement uses the properties call to do the following:
+  // - When a value changes it reacts to the change
+  // - When it reacts to the change and it's listed in the render() method, it rerenders
+  // - this is what users would expect, but is not the way the web usually works
+  // - Lit + Web component spec + properties == HTML with data variables
   static get properties() {
     return {
-      counter: { type: Number },
-      min: { type: Number },
-      max: { type: Number }
+      // this is a String. Array, Object, Number, Boolean are other valid values here
+      title: { type: String },
     };
-  }
-
-  getCounterColor() {
-    return this.counter === 21 ? 'blue' :
-           this.counter === 18 ? 'green' :
-           this.counter === this.min || this.counter === this.max ? 'red' : 'black';
-  }
-
-  increment() {
-    this.counter++;
-  }
-
-  decrement() {
-    this.counter--;
   }
 }
 
@@ -134,4 +108,4 @@ export class CounterApp extends LitElement {
 // Lit operates juuuust above the standards layer and leverages other standards
 // in order to deliver optimal performance with minimal "syntactical sugar"
 // aka things specific to Lit itself
-globalThis.customElements.define(CounterApp.tag, CounterApp);
+globalThis.customElements.define(CampusAlert.tag, CampusAlert);
