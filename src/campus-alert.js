@@ -22,7 +22,7 @@ export class CampusAlert extends LitElement {
   // I glance and go "oh the HTML tag for this code is called polaris-chip"
   // see the very bottom of the file for where this is actually implemented
   static get tag() {
-    return 'polaris-chip';
+    return 'campus-alert';
   }
   // constructor establishes defaults for the class
   constructor() {
