@@ -29,6 +29,7 @@ export class CampusAlert extends LitElement {
     super();
     // a variable on this object called title
     this.open = true;
+    this.sticky = false;
   }
 
   // CSS styles are scoped JUST to this element. This uses a technology called
@@ -47,6 +48,11 @@ export class CampusAlert extends LitElement {
     }
     :host([status="alert"]) {
       --alert-color: #dc3545; /* Red for alert */
+    }
+    :host([sticky]) {
+      position: sticky;
+      top: 0;
+      z-index: 100; /* Adjust z-index as needed */
     }
     :host {
         --alert-color: #ffc107; /* Default alert color */
@@ -95,7 +101,7 @@ export class CampusAlert extends LitElement {
   render() {
     return this.open
     ? html`
-        <div class="alert-content">
+        <div class="alert-content ${this.sticky ? 'sticky' : ''}">
           <span class="alert-icon">⚠️</span>
           <div class="alert-text">
             <slot></slot> <!-- User provided content will be projected here -->
@@ -119,6 +125,7 @@ export class CampusAlert extends LitElement {
   }
   connectedCallback() {
     super.connectedCallback();
+    this.sticky = this.getAttribute('sticky') !== null;
     if (localStorage.getItem('campusAlertClosed')) {
       this.open = false;
     }
@@ -128,7 +135,8 @@ export class CampusAlert extends LitElement {
       // this is a String. Array, Object, Number, Boolean are other valid values here
       open: { type: Boolean, reflect: true },
       status: { type: String, reflect: true },
-      date: { type: String }
+      date: { type: String },
+      sticky: { type: Boolean, reflect: true }
     };
   }
 }
