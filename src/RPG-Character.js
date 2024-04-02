@@ -1,6 +1,7 @@
 import { css, html } from 'lit';
-import { DDD } from '@lrnwebcomponents/d-d-d/d-d-d.js'; 
+import { DDD } from '@lrnwebcomponents/d-d-d/d-d-d.js';
 import '@lrnwebcomponents/rpg-character/rpg-character.js';
+import '@lrnwebcomponents/multiple-choice/lib/confetti-container.js';
 
 class RPGCard extends DDD {
     static get tag() {
@@ -91,6 +92,14 @@ class RPGCard extends DDD {
             this.teams = [...this.teams, { name: this.inputTeamName.trim(), members: [...this.users] }];
             this.users = [];
             this.inputTeamName = '';
+            this.makeItRain();
+        }
+    }
+
+    makeItRain() {
+        const confettiEl = this.shadowRoot.getElementById('confetti');
+        if (confettiEl) {
+            confettiEl.setAttribute('popped', '');
         }
     }
 
@@ -157,6 +166,8 @@ class RPGCard extends DDD {
                     </ul>
                 </div>
             ` : ''}
+
+            <confetti-container id="confetti"></confetti-container>
         `;
     }
 }
