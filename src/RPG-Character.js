@@ -1,6 +1,6 @@
 import { css, html } from 'lit';
 import { DDD } from '@lrnwebcomponents/d-d-d/d-d-d.js'; 
-import '@lrnwebcomponents/rpg-character/rpg-character.js'; // Importing the RPG character component
+import '@lrnwebcomponents/rpg-character/rpg-character.js';
 
 class RPGCard extends DDD {
     static get tag() {
@@ -11,7 +11,10 @@ class RPGCard extends DDD {
         return {
             title: { type: String },
             users: { type: Array },
-            inputUserName: { type: String }
+            teams: { type: Array },
+            inputUserName: { type: String },
+            inputTeamName: { type: String },
+            selectedTeam: { type: String }
         };
     }
 
@@ -19,7 +22,10 @@ class RPGCard extends DDD {
         super();
         this.title = "RPG Characters";
         this.users = [];
+        this.teams = [];
         this.inputUserName = '';
+        this.inputTeamName = '';
+        this.selectedTeam = null;
     }
 
     static get styles() {
@@ -60,7 +66,6 @@ class RPGCard extends DDD {
         ];
     }
 
-    // Input scrub function (adapted from haxcms-party-ui.js)
     inputScrub(e) {
         if (e.key === "Enter") {
             this.addUser();
@@ -81,17 +86,47 @@ class RPGCard extends DDD {
         this.users = this.users.filter(user => user !== userName);
     }
 
+    createTeam() {
+        if (this.users.length >= 2 && this.inputTeamName.trim()) {
+            this.teams = [...this.teams, { name: this.inputTeamName.trim(), members: [...this.users] }];
+            this.users = [];
+            this.inputTeamName = '';
+        }
+    }
+
+    selectTeam(teamName) {
+        this.selectedTeam = teamName;
+    }
+
+    removeTeam(teamName) {
+        this.teams = this.teams.filter(team => team.name !== teamName);
+        if (this.selectedTeam === teamName) {
+            this.selectedTeam = null;
+        }
+    }
+
     renderUserList() {
         return html`
             <ul>
                 ${this.users.map(user => html`
                     <li>
-                        <rpg-character seed="${user}"></rpg-character> <!-- Displaying the RPG character sprite -->
+                        <rpg-character seed="${user}"></rpg-character>
                         ${user}
                         <button @click="${() => this.removeUser(user)}">Remove</button>
                     </li>
                 `)}
             </ul>
+        `;
+    }
+
+    renderTeamList() {
+        return html`
+            ${this.teams.map(team => html`
+                <div>
+                    <button @click="${() => this.selectTeam(team.name)}">${team.name}</button>
+                    <button @click="${() => this.removeTeam(team.name)}">Remove Team</button>
+                </div>
+            `)}
         `;
     }
 
@@ -101,6 +136,27 @@ class RPGCard extends DDD {
             <input type="text" .value="${this.inputUserName}" @input="${this.inputScrub}" placeholder="Enter character name">
             <button @click="${this.addUser}">Add Character</button>
             ${this.renderUserList()}
+
+            ${this.users.length >= 2 ? html`
+                <input type="text" .value="${this.inputTeamName}" @input="${e => this.inputTeamName = e.target.value}" placeholder="Enter team name">
+                <button @click="${this.createTeam}">Save Team</button>
+            ` : ''}
+
+            ${this.renderTeamList()}
+
+            ${this.selectedTeam ? html`
+                <div>
+                    <h3>${this.selectedTeam}</h3>
+                    <ul>
+                        ${this.teams.find(team => team.name === this.selectedTeam).members.map(user => html`
+                            <li>
+                                <rpg-character seed="${user}"></rpg-character>
+                                ${user}
+                            </li>
+                        `)}
+                    </ul>
+                </div>
+            ` : ''}
         `;
     }
 }
