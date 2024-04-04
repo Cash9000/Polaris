@@ -141,6 +141,7 @@ class RPGCard extends DDD {
 
     render() {
         return html`
+        <confetti-container id="confetti">
             <div class="card-title">${this.title}</div>
             <input type="text" .value="${this.inputUserName}" @input="${this.inputScrub}" placeholder="Enter character name">
             <button @click="${this.addUser}">Add Character</button>
@@ -167,7 +168,7 @@ class RPGCard extends DDD {
                 </div>
             ` : ''}
 
-            <confetti-container id="confetti"></confetti-container>
+            </confetti-container>
         `;
     }
 }
