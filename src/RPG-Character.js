@@ -67,24 +67,37 @@ class RPGCard extends DDD {
         ];
     }
 
-    inputScrub(e) {
-        if (e.key === "Enter") {
-            this.addUser();
-        }
-        const inputVal = e.target.value;
-        const scrubVal = inputVal.toLowerCase().replace(/[^a-z0-9]+$/g, "");
-        this.inputUserName = scrubVal.slice(0, 10);
-    }
-
     addUser() {
         if (this.inputUserName.trim() && !this.users.includes(this.inputUserName)) {
-            this.users = [...this.users, this.inputUserName.trim()];
-            this.inputUserName = '';
+            const hasSpecialChars = /[^a-z0-9 ]/.test(this.inputUserName);
+            const hasSpaces = /\s/.test(this.inputUserName);
+            if (!hasSpecialChars && !hasSpaces) {
+                this.users = [...this.users, this.inputUserName.trim()];
+                this.inputUserName = ''; // Clear the input after adding
+            } else {
+                let alertMessage = "This name cannot be added because it contains ";
+                if (hasSpecialChars && hasSpaces) {
+                    alertMessage += "special characters and spaces.";
+                } else if (hasSpecialChars) {
+                    alertMessage += "special characters.";
+                } else if (hasSpaces) {
+                    alertMessage += "spaces.";
+                }
+                alert(alertMessage);
+            }
         }
     }
 
     removeUser(userName) {
         this.users = this.users.filter(user => user !== userName);
+    }
+
+    removeTeamMember(teamName, memberName) {
+        const team = this.teams.find(team => team.name === teamName);
+        if (team) {
+            team.members = team.members.filter(member => member !== memberName);
+        }
+        this.requestUpdate();
     }
 
     createTeam() {
@@ -134,6 +147,9 @@ class RPGCard extends DDD {
                 <div>
                     <button @click="${() => this.selectTeam(team.name)}">${team.name}</button>
                     <button @click="${() => this.removeTeam(team.name)}">Remove Team</button>
+                    ${team.members.map(member => html`
+                        <div>${member}<button @click="${() => this.removeTeamMember(team.name, member)}">Remove Member</button></div>
+                    `)}
                 </div>
             `)}
         `;
@@ -141,33 +157,30 @@ class RPGCard extends DDD {
 
     render() {
         return html`
-        <confetti-container id="confetti">
-            <div class="card-title">${this.title}</div>
-            <input type="text" .value="${this.inputUserName}" @input="${this.inputScrub}" placeholder="Enter character name">
-            <button @click="${this.addUser}">Add Character</button>
-            ${this.renderUserList()}
-
-            ${this.users.length >= 2 ? html`
-                <input type="text" .value="${this.inputTeamName}" @input="${e => this.inputTeamName = e.target.value}" placeholder="Enter team name">
-                <button @click="${this.createTeam}">Save Team</button>
-            ` : ''}
-
-            ${this.renderTeamList()}
-
-            ${this.selectedTeam ? html`
-                <div>
-                    <h3>${this.selectedTeam}</h3>
-                    <ul>
-                        ${this.teams.find(team => team.name === this.selectedTeam).members.map(user => html`
-                            <li>
-                                <rpg-character seed="${user}"></rpg-character>
-                                ${user}
-                            </li>
-                        `)}
-                    </ul>
-                </div>
-            ` : ''}
-
+            <confetti-container id="confetti">
+                <div class="card-title">${this.title}</div>
+                <input type="text" .value="${this.inputUserName}" @input="${e => this.inputUserName = e.target.value}" placeholder="Enter character name">
+                <button @click="${this.addUser}">Add Character</button>
+                ${this.renderUserList()}
+                ${this.users.length >= 2 ? html`
+                    <input type="text" .value="${this.inputTeamName}" @input="${e => this.inputTeamName = e.target.value}" placeholder="Enter team name">
+                    <button @click="${this.createTeam}">Save Team</button>
+                ` : ''}
+                ${this.renderTeamList()}
+                ${this.selectedTeam ? html`
+                    <div>
+                        <h3>${this.selectedTeam}</h3>
+                        <ul>
+                            ${this.teams.find(team => team.name === this.selectedTeam).members.map(user => html`
+                                <li>
+                                    <rpg-character seed="${user}"></rpg-character>
+                                    ${user}
+                                    <button @click="${() => this.removeTeamMember(this.selectedTeam, user)}">Remove</button>
+                                </li>
+                            `)}
+                        </ul>
+                    </div>
+                ` : ''}
             </confetti-container>
         `;
     }
