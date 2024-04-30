@@ -99,34 +99,56 @@ async loadData() {
     this.tags = [];
   }
 }
+  clearTagStyles() {
+  const tags = this.shadowRoot.querySelectorAll('.tag');
+  tags.forEach(tag => {
+    tag.classList.remove('correct', 'incorrect');
+  });
+    }
 
-reset() {
-  this.loadData();  // Reload and reshuffle tags when resetting
+  reset() {
+    this.loadData();  // Reload and reshuffle tags when resetting
+      this.clearTagStyles();
+    } 
+
+toggleTag(event) {
+  const tagElement = event.target.closest('.tag'); // Get the closest tag element from the click
+  if (!tagElement) return; // If not clicked on a tag, do nothing
+  
+  const parentElement = tagElement.parentNode;
+  const tagPool = this.shadowRoot.querySelector('#tag-pool');
+  const answerArea = this.shadowRoot.querySelector('.answer-area');
+
+  if (parentElement === tagPool) {
+    answerArea.appendChild(tagElement); // Move tag to the answer area
+  } else if (parentElement === answerArea) {
+    tagPool.appendChild(tagElement); // Move tag back to the tag pool
+    this.clearTagStyles(); // Clear styles when a tag is moved out of the drop zone
+  }
 }
-
 
 render() {
   return html`
     <confetti-container id="confetti">
       <div>
         <div class="description">
-          Welcome to the Tagging Interaction Module! This tool is designed to enhance learning experiences by allowing users to interact with content through a tagging system. Look at the provided image and read the accompanying question. Drag and drop the appropriate tags into the answer area based on your understanding of the content. Tags can be evaluated for correctness, and you'll receive immediate feedback on your selections. This interactive approach helps reinforce learning and improve content comprehension.
+          Welcome to the Tagging Interaction Module! This tool is designed to enhance learning experiences by allowing users to interact with content through a tagging system. Look at the provided image and read the accompanying question. You can either drag and drop or click on the tags to move them into the answer area based on your understanding of the content. Tags can be evaluated for correctness, and you'll receive immediate feedback on your selections. This interactive approach helps reinforce learning and improve content comprehension.
         </div>
         ${this.img ? html`<img src="${this.img}" alt="Relevant imagery">` : ''}
         <h2>${this.question}</h2>
-        <div id="tag-pool" @dragstart="${this.handleDragStart}">
+        <div id="tag-pool" @click="${this.toggleTag}">
           ${this.tags.map(tag => html`
-            <div class="tag" draggable="true" data-tag="${tag.tag}">${tag.tag}</div>
+            <div class="tag" draggable="true" @dragstart="${this.handleDragStart}" data-tag="${tag.tag}">${tag.tag}</div>
           `)}
         </div>
-        <div class="answer-area" @dragover="${this.allowDrop}" @drop="${this.handleDrop}">
+        <div class="answer-area" @dragover="${this.allowDrop}" @drop="${this.handleDrop}" @click="${this.toggleTag}">
           Drop tags here
-          </div>
-          <button @click="${this.checkAnswers}">Check Answer</button>
-          <button @click="${this.reset}">Reset</button>
         </div>
-      </confetti-container>
-    `;
+        <button @click="${this.checkAnswers}">Check Answer</button>
+        <button @click="${this.reset}">Reset</button>
+      </div>
+    </confetti-container>
+  `;
 }
 
   handleDragStart(event) {
@@ -170,7 +192,7 @@ render() {
       this.shadowRoot.querySelector('#confetti').setAttribute('popped', '');
     }
   }
-
+  
   reset() {
     const tagPool = this.shadowRoot.querySelector('#tag-pool');
     const answerArea = this.shadowRoot.querySelector('.answer-area');
