@@ -48,7 +48,8 @@ export class TaggingQuestion extends LitElement {
       correctAnswers: { type: Array },
       img: { type: String },
       dataUrl: { type: String, attribute: 'data-url' }, // New property for the URL of the JSON file
-      question: { type: String, attribute: 'question' }
+      question: { type: String, attribute: 'question' },
+      dropBoxEnabled: { type: Boolean }
     };
   }
 
@@ -63,6 +64,7 @@ export class TaggingQuestion extends LitElement {
     this.img = '';
     this.dataUrl = '';
     this.question = 'Which of the following tags apply?';
+    this.dropBoxEnabled = true;
   }
 
   connectedCallback() {
@@ -112,6 +114,7 @@ async loadData() {
     } 
 
 toggleTag(event) {
+  if (!this.dropBoxEnabled) return;
   const tagElement = event.target.closest('.tag'); // Get the closest tag element from the click
   if (!tagElement) return; // If not clicked on a tag, do nothing
   
@@ -160,6 +163,7 @@ render() {
   }
 
   handleDrop(event) {
+    if (!this.dropBoxEnabled) return;
     event.preventDefault();
     const data = event.dataTransfer.getData("text");
     const draggableElement = this.shadowRoot.querySelector(`[data-tag="${data}"]`);
@@ -170,6 +174,7 @@ render() {
   }
 
   checkAnswers() {
+    this.dropBoxEnabled = false;
     const answerArea = this.shadowRoot.querySelector('.answer-area');
     const selectedTags = Array.from(answerArea.children);
     let allCorrect = true;
@@ -208,6 +213,8 @@ render() {
     answerArea.querySelectorAll('.tag').forEach(tag => {
       tag.classList.remove('correct', 'incorrect');
       tagPool.appendChild(tag);
+      this.dropBoxEnabled = true;
+      this.loadData();
     });
   }
 }
