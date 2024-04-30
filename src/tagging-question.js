@@ -15,7 +15,7 @@ export class TaggingQuestion extends LitElement {
         background-color: lightgrey;
         border-radius: 8px;
         cursor: pointer;
-        user-select: none; /* Prevents selection while dragging */
+        user-select: none;
       }
       .answer-area {
         min-height: 50px;
@@ -34,13 +34,21 @@ export class TaggingQuestion extends LitElement {
       .incorrect {
         border: 2px solid red;
       }
+      img {
+        max-width: 100%;
+        height: auto;
+        margin-bottom: 16px;
+      }
     `;
   }
 
   static get properties() {
     return {
       tags: { type: Array },
-      correctAnswers: { type: Array }
+      correctAnswers: { type: Array },
+      img: { type: String },
+      dataUrl: { type: String, attribute: 'data-url' }, // New property for the URL of the JSON file
+      question: { type: String, attribute: 'question' }
     };
   }
 
@@ -50,44 +58,83 @@ export class TaggingQuestion extends LitElement {
 
   constructor() {
     super();
-    this.tags = [
-      { text: 'good form', correct: true, feedback: 'The shape of the vase clearly demonstrates craftsmanship' },
-      { text: 'poor taste', correct: false, feedback: 'Taste is in the eye of the designer as well as the viewer.' },
-      { text: 'contrasting themes', correct: false, feedback: 'There is uniformity in the shape, but there is no depth to this media to imply that it is contrasting with other figures.' },
-      { text: 'AI', correct: true, feedback: 'While a modification of prior work, this is still AI generative work.' },
-      { text: 'shading', correct: false, feedback: 'While there is a light source and a shadow cast, shading is a term used for pencil based sketching' },
-      { text: 'original work', correct: true, feedback: 'This character is not based on any person, place, or existing trope' },
-      { text: 'accessible', correct: false, feedback: 'The color scheme while high contrast in some areas, loses form in others and has written text unrelated to the character' }
-    ];
-    this.correctAnswers = this.tags.filter(tag => tag.correct).map(tag => tag.text);
+    this.tags = [];
+    this.correctAnswers = [];
+    this.img = '';
+    this.dataUrl = '';
+    this.question = 'Which of the following tags apply?';
   }
 
-  render() {
-    return html`
-      <confetti-container id="confetti">
-        <div>
-          <h2>Which of the following tags apply?</h2>
-          <div id="tag-pool" @dragstart="${this.handleDragStart}">
-            ${this.tags.map(tag => html`
-              <div class="tag" draggable="true" data-tag="${tag.text}">${tag.text}</div>
-            `)}
-          </div>
-          <div class="answer-area" @dragover="${this.allowDrop}" @drop="${this.handleDrop}">
-            Drop tags here
+  connectedCallback() {
+    super.connectedCallback();
+    if (this.dataUrl) {
+      this.loadData();
+    }
+  }
+// Helper function to shuffle an array (Fisher-Yates shuffle)
+_shuffleArray(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+}
+
+async loadData() {
+  if (!this.dataUrl) return;
+  try {
+    const response = await fetch(this.dataUrl);
+    if (!response.ok) {
+      throw new Error('Network response was not ok.');
+    }
+    const data = await response.json();
+    this.tags = data.map(item => ({
+      tag: item.text,
+      correct: item.correct,
+      feedback: item.feedback
+    }));
+    this._shuffleArray(this.tags);  // Shuffle the tags initially
+    this.correctAnswers = this.tags.filter(tag => tag.correct).map(tag => tag.tag);
+  } catch (error) {
+    console.error("Failed to load data:", error);
+    this.tags = [];
+  }
+}
+
+reset() {
+  this.loadData();  // Reload and reshuffle tags when resetting
+}
+
+
+render() {
+  return html`
+    <confetti-container id="confetti">
+      <div>
+        <div class="description">
+          Welcome to the Tagging Interaction Module! This tool is designed to enhance learning experiences by allowing users to interact with content through a tagging system. Look at the provided image and read the accompanying question. Drag and drop the appropriate tags into the answer area based on your understanding of the content. Tags can be evaluated for correctness, and you'll receive immediate feedback on your selections. This interactive approach helps reinforce learning and improve content comprehension.
+        </div>
+        ${this.img ? html`<img src="${this.img}" alt="Relevant imagery">` : ''}
+        <h2>${this.question}</h2>
+        <div id="tag-pool" @dragstart="${this.handleDragStart}">
+          ${this.tags.map(tag => html`
+            <div class="tag" draggable="true" data-tag="${tag.tag}">${tag.tag}</div>
+          `)}
+        </div>
+        <div class="answer-area" @dragover="${this.allowDrop}" @drop="${this.handleDrop}">
+          Drop tags here
           </div>
           <button @click="${this.checkAnswers}">Check Answer</button>
           <button @click="${this.reset}">Reset</button>
         </div>
       </confetti-container>
     `;
-  }
+}
 
   handleDragStart(event) {
     event.dataTransfer.setData("text", event.target.getAttribute('data-tag'));
   }
 
   allowDrop(event) {
-    event.preventDefault(); // Necessary to allow dropping
+    event.preventDefault();
   }
 
   handleDrop(event) {
@@ -107,8 +154,8 @@ export class TaggingQuestion extends LitElement {
 
     selectedTags.forEach(tag => {
       const tagText = tag.getAttribute('data-tag');
-      const tagData = this.tags.find(t => t.text === tagText);
-      if (tagData.correct) {
+      const tagData = this.tags.find(t => t.tag === tagText);
+      if (tagData && tagData.correct) {
         tag.classList.add('correct');
         tag.classList.remove('incorrect');
       } else {
@@ -129,10 +176,9 @@ export class TaggingQuestion extends LitElement {
     const answerArea = this.shadowRoot.querySelector('.answer-area');
     answerArea.querySelectorAll('.tag').forEach(tag => {
       tag.classList.remove('correct', 'incorrect');
-      tagPool.appendChild(tag); // Move all tags back to the pool
+      tagPool.appendChild(tag);
     });
   }
 }
 
-// Register the custom element with the tag defined in the static getter
 globalThis.customElements.define(TaggingQuestion.tag, TaggingQuestion);
