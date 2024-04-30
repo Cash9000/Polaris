@@ -173,25 +173,34 @@ render() {
     const answerArea = this.shadowRoot.querySelector('.answer-area');
     const selectedTags = Array.from(answerArea.children);
     let allCorrect = true;
-
+  
     selectedTags.forEach(tag => {
       const tagText = tag.getAttribute('data-tag');
       const tagData = this.tags.find(t => t.tag === tagText);
-      if (tagData && tagData.correct) {
-        tag.classList.add('correct');
-        tag.classList.remove('incorrect');
+      if (tagData) {
+        if (tagData.correct) {
+          tag.classList.add('correct');
+          tag.classList.remove('incorrect');
+          alert(`Correct: ${tagText} - ${tagData.feedback}`);  // Ensure feedback for correct tags
+        } else {
+          tag.classList.add('incorrect');
+          tag.classList.remove('correct');
+          allCorrect = false;
+          alert(`Incorrect: ${tagText} - ${tagData.feedback}`);  // Ensure feedback for incorrect tags
+        }
       } else {
-        tag.classList.add('incorrect');
-        tag.classList.remove('correct');
+        // If no data found for a tag (shouldn't happen normally), handle gracefully
+        console.error("No data found for tag:", tagText);
         allCorrect = false;
-        alert(tagData.feedback); // Show feedback for incorrect tags
       }
     });
-
+  
     if (allCorrect && selectedTags.length === this.correctAnswers.length) {
       this.shadowRoot.querySelector('#confetti').setAttribute('popped', '');
     }
   }
+  
+  
   
   reset() {
     const tagPool = this.shadowRoot.querySelector('#tag-pool');
